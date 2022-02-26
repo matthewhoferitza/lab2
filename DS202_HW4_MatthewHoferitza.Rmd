@@ -1,0 +1,182 @@
+---
+title: 'Homework #4'
+author: "Matthew Hoferitza"
+date: "2/22/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(tidyverse)
+```
+*Team Members: Matthew Hoferitza*
+
+
+`######link11111`
+
+## Question Set I
+
+**Question 1**
+```{r}
+#What is the overall number of chocolate bars rated?
+choco<-read.csv(file = "choco.csv", stringsAsFactors = T, header=T)
+head(choco)
+str(choco)
+summary(choco)
+cat("The number of chocolate bars rated is", dim(choco)[1])
+```
+
+**Qustion 2**
+```{r}
+#How does the number of ratings depend on the year? Draw a bar chart of the number of reports.
+choco$Review.Date<-as.factor(choco$Review.Date)
+
+ggplot(choco, aes(x = Review.Date))+ 
+  geom_bar(fill = "darkgreen", colour = "black")+
+  geom_text(stat = "count", aes(label = after_stat(count)), vjust = -.55)+
+  theme_bw()+
+  theme(axis.title.y = element_text(size = rel(1.4)),
+        axis.title.x = element_text(size = rel(1.4)),
+        axis.text.x = element_text(size = rel(1.6)),
+        axis.text.y = element_text(size = rel(1.6)),
+        plot.title = element_text(hjust=0.5, size = rel(1.5)))+
+  labs(x = "Year of Review",
+       y = "Number of Chocolate Bars",
+       title = "Number of Chocolate Bars Reviewed by Year")
+```
+
+*The number of chocolate bars reviewed in a given year peaked in 2015 with 285 reviews. Until that point it had been steadily increasing from year to year beginning in 2006, with exceptions being 2010 and 2013 which experienced dips from their previous years. After 2015, the number of ratings decreased more sharply. The drop off between 2016 and 2017 was the largest disparity measured.*
+
+## Question Set II
+
+**Qustion 1.**
+```{r}
+#How are ratings distributed? Draw a histogram of ratings and describe it. Don’t forget to mention outliers, if there are any.
+
+ggplot(choco, aes(x=Rating))+
+  geom_histogram(binwidth=0.25, fill = "darkslateblue", colour = "black")+
+  theme_bw()+
+  theme(axis.title.y = element_text(size = rel(1.4)),
+        axis.title.x = element_text(size = rel(1.4)),
+        axis.text.x = element_text(size = rel(1.6)),
+        axis.text.y = element_text(size = rel(1.6)),
+        plot.title = element_text(hjust=0.5, size = rel(2)))+
+  labs(x = "Rating",
+       y = "Number of Chocolate Bars",
+       title = "Rating Distribution of Chocolate Bars")
+
+ggplot(choco, aes(x=Rating))+
+  geom_histogram(binwidth=0.25, fill = "darkslateblue", colour = "black")+
+  theme_bw()+
+  scale_y_sqrt()+
+  theme(axis.title.y = element_text(size = rel(1.4)),
+        axis.title.x = element_text(size = rel(1.4)),
+        axis.text.x = element_text(size = rel(1.6)),
+        axis.text.y = element_text(size = rel(1.6)),
+        plot.title = element_text(hjust=0.5, size = rel(2)))+
+  labs(x = "Rating",
+       y = "Number of Chocolate Bars",
+       title = "Rating Distribution of Chocolate Bars")
+```
+
+*There are few five star ratings that could be considered outliers. The most common rating was a 3.5. The center of the distribution was somewhere between 3 and 3.5, and the distribution was skewed left. By shifting the scale, we are better able to see the true number of 1 and 5 star ratings.*
+
+**Question 2.**
+```{r}
+#Do ratings depend on the cocoa percentage of a chocolate bar?
+# ggplot(choco, aes(fill= Rating, x = Cocoa.Pct))+ 
+#   geom_bar(position="stack", colour = "black")+
+#   theme_bw()+
+#   theme(axis.title.y = element_text(size = rel(1.4)),
+#         axis.title.x = element_text(size = rel(1.4)),
+#         axis.text.x = element_text(size = rel(1.6)),
+#         axis.text.y = element_text(size = rel(1.6)),
+#         plot.title = element_text(hjust=0.5, size = rel(1.5)))+
+#   labs(x = "Cocoa Percentage",
+#        y = "Number of Chocolate Bars",
+#        title = "Number of Chocolate Bars of Each Rating by Cocoa Percentage")+
+#   scale_fill_brewer(palette = "Set3")
+
+ggplot(choco, aes(x=Cocoa.Pct, y=Rating)) +
+  geom_point(size=1.5, shape=20)+
+  geom_jitter()+
+  labs(x = "Cocoa Percentage",
+       y = "Rating",
+       title = "Scatterplot of Cocoa Percentage vs Rating")
+
+ggplot(choco, aes(x=Cocoa.Pct, y=Rating, group=Cocoa.Pct, colour=Cocoa.Pct))+
+  geom_boxplot()+
+  labs(x = "Cocoa Percentage",
+       y = "Rating",
+       title = "Boxplot Comparing Ratings by Cocoa Percentage")
+```
+
+*It appears that the ratings are highest between 60 to 80 percent cocoa. This is not very meaningful. The vast majority of bars fall within this range, the exceptions being the rare, very high percent cocoa bars (which are often bitter) which tend to have lower ratings. Within the dominant range, there is not a clear trend as bars move from 60 to 80 percent cocoa.*
+
+
+**Question 3.**
+```{r}
+#How do ratings compare across different company locations?
+ggplot(dplyr::filter(choco, Company.Location %in% c("U.S.A.", "France", "Canada")), aes(y= Rating, x=Company.Location, fill=Company.Location))+
+  geom_boxplot()+
+  labs(x = "Company Location",
+       y = "Rating",
+       title = "Boxplot Comparing Ratings by Company Location")+
+  scale_fill_brewer(palette="Set2")
+
+ggplot(dplyr::filter(choco, Company.Location %in% c("U.S.A.", "France", "Canada")), aes(fill=Company.Location, x = Rating))+ 
+  stat_count(position="dodge", colour="black")+
+  theme_bw()+
+  theme(axis.title.y = element_text(size = rel(1.4)),
+        axis.title.x = element_text(size = rel(1.4)),
+        axis.text.x = element_text(size = rel(1.6)),
+        axis.text.y = element_text(size = rel(1.6)),
+        plot.title = element_text(hjust=0.5, size = rel(1.5)))+
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 10))+
+  labs(x = "Rating",
+       y = "Number of Chocolate Bars",
+       title = "Number of Chocolate Bars Ratings by Company Location")+
+  scale_fill_brewer(palette = "Set2")
+```
+
+*When observing the box plot, one sees that the median rating at each location is the same. Canada has an IQR that extends the highest (3.75), while the U.S. range extends the lowest (2.75). The bar graph shows that the U.S. has by far the most reviewed bars. Additionally, for both the U.S. and France, the most common rating was a 3.5. Canada's most common was 3.25, but the difference between the number of 3.25 and 3.5 ratings was small. Canada also had a relatively high number of 4 star ratings. The ratings may favor Canada slightly.*
+## My Question
+
+**Does bean origin affect rating?**
+
+```{r}
+names(sort(-table(choco$Broad.Bean.Origin)))
+dim(dplyr::filter(choco, Broad.Bean.Origin %in% c("Venezuela", "Ecuador", "Peru", "Madagascar", "Dominican Republic")))
+
+ggplot(dplyr::filter(choco, Broad.Bean.Origin %in% c("Venezuela", "Ecuador", "Peru", "Madagascar", "Dominican Republic")), aes(x=Cocoa.Pct, y=Rating, colour=Broad.Bean.Origin)) +
+  geom_point(size=1.5, shape=20)+
+  geom_jitter()+
+  labs(x = "Bean Origin",
+       y = "Rating",
+       title = "Scatterplot of Bean Origin vs Rating")
+
+ggplot(dplyr::filter(choco, Broad.Bean.Origin %in% c("Venezuela", "Ecuador", "Peru", "Madagascar", "Dominican Republic")), aes(fill=Broad.Bean.Origin, x = Rating))+ 
+  stat_count(position="stack", colour="black")+
+  theme_bw()+
+  theme(axis.title.y = element_text(size = rel(1.4)),
+        axis.title.x = element_text(size = rel(1.4)),
+        axis.text.x = element_text(size = rel(1.6)),
+        axis.text.y = element_text(size = rel(1.6)),
+        plot.title = element_text(hjust=0.5, size = rel(1.5)))+
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 10))+
+  labs(x = "Rating",
+       y = "Number of Chocolate Bars",
+       title = "Number of Chocolate Bars Ratings by Bean Origin")+
+  scale_fill_brewer(palette = "Set1")
+
+ggplot(dplyr::filter(choco, Broad.Bean.Origin %in% c("Venezuela", "Ecuador", "Peru", "Madagascar", "Dominican Republic")), aes(y= Rating, x=Broad.Bean.Origin, fill=Broad.Bean.Origin))+
+  geom_boxplot()+
+  labs(x = "Bean Origin",
+       y = "Rating",
+       title = "Boxplot Comparing Ratings by Bean Origin")+
+  scale_fill_brewer(palette="Set1")
+```
+
+*Similarly to the company location analysis, the median rating across each bean origin location was constant, but the ranges varied slightly. In this case Venezuela came out on top with the highest extending IQR (it also included the 5 star outlier). The IQR's of both Ecuador and Peru extended the lowest. The Dominican Republic and Madagascar had the narrowest IQR's, showign they more fairly consistent rating wise. The bar plot displays that as the rating gets high (4 and above), Venezuela's share increases.*
+
